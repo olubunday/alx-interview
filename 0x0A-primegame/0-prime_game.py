@@ -1,86 +1,28 @@
 #!/usr/bin/python3
+"""Prime game module.
 """
-Module 0-prime_game
-"""
-
-
-def isPrime(num):
-    """
-    checks if a num
-    is a prime number
-    """
-    if num < 2:
-        return False
-    for i in range(2, num):
-        if (num % i) == 0:
-            return False
-    return True
-
-
-def getPrime(ints):
-    """
-    Returns a prime number
-    from a set
-    """
-    for n in ints:
-        if isPrime(n):
-            return n
-    return None
-
-
-def removePrimeNo(ints, prime):
-    """
-    removes a prime number from a set
-    """
-    ints.remove(prime)
-
-
-def removeMultiples(ints, number, player):
-    """removes multiples of a number"""
-    for x in ints.copy():
-        if (x % number) == 0:
-            # print(f"{player} removes {x}")
-            ints.remove(x)
 
 
 def isWinner(x, nums):
+    """Determines the winner of a prime game session with `x` rounds.
     """
-    Determines the winner
-    """
-    m_wins = 0
-    b_wins = 0
-    canPlay = True
-    times = 0
-
-    if not x or not nums:
+    if x < 1 or not nums:
         return None
-
-    for n in nums:
-        ints = set([n for n in range(1, n + 1)])
-        player = "m"
-        while times <= x:
-            prime = getPrime(ints)
-            # A win for the other player
-            # when no more prime numbers exist
-            # print(f"{player} picks {prime}")
-            if prime is None:
-                if player == "m":
-                    b_wins += 1
-                else:
-                    m_wins += 1
-                break
-            # remove prime number
-            # print(f"{player} removes {prime}")
-            removePrimeNo(ints, prime)
-            removeMultiples(ints, prime, player)
-
-            if player == "b":
-                player = "m"
-            else:
-                player = "b"
-            times += 1
-        times = 0
-
-    if m_wins == b_wins:
+    marias_wins, bens_wins = 0, 0
+    # generate primes with a limit of the maximum number in nums
+    n = max(nums)
+    primes = [True for _ in range(1, n + 1, 1)]
+    primes[0] = False
+    for i, is_prime in enumerate(primes, 1):
+        if i == 1 or not is_prime:
+            continue
+        for j in range(i + i, n + 1, i):
+            primes[j - 1] = False
+    # filter the number of primes less than n in nums for each round
+    for _, n in zip(range(x), nums):
+        primes_count = len(list(filter(lambda x: x, primes[0: n])))
+        bens_wins += primes_count % 2 == 0
+        marias_wins += primes_count % 2 == 1
+    if marias_wins == bens_wins:
         return None
-    return "Maria" if m_wins > b_wins else "Ben"
+    return 'Maria' if marias_wins > bens_wins else 'Ben'
